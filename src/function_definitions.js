@@ -48,5 +48,12 @@ module.exports = {
     } else {
       return a/b;
     }
+  },
+  'vec_len': function(a) {
+    if (a.x != null) {
+      return Math.sqrt(a.x*a.x + a.y*a.y)
+    } else {
+      return +a;
+    }
   }
 }
