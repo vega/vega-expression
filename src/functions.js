@@ -101,6 +101,15 @@ module.exports = function(codegen) {
         throw new Error('Too many arguments to if function.');
         var a = args.map(codegen);
         return a[0]+'?'+a[1]+':'+a[2];
-      }
+      },
+
+    // Vector operations
+    'vec': 'fn.vec',
+    'vec_add': 'fn.vec_add',
+    'vec_sub': 'fn.vec_sub',
+    'vec_times': 'fn.vec_times',
+    'vec_len': 'fn.vec_len',
+    'vec_neg': 'fn.vec_neg',
+    'vec_div': 'fn.vec_neg'
   };
 };
