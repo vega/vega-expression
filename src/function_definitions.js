@@ -55,5 +55,8 @@ module.exports = {
     } else {
       return +a;
     }
+  },
+  'vec_len2': function(a) {
+    return a.x*a.x + a.y*a.y;
   }
 }
