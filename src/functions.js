@@ -110,6 +110,6 @@ module.exports = function(codegen) {
     'vec_times': 'fn.vec_times',
     'vec_len': 'fn.vec_len',
     'vec_neg': 'fn.vec_neg',
-    'vec_div': 'fn.vec_neg'
+    'vec_div': 'fn.vec_div'
   };
 };

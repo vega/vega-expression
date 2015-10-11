@@ -13,6 +13,7 @@ module.exports = {
   },
   'vec_times': function(a, b) {
     if (a.x != null && b.x != null) {
+      // TODO: is pairwise multiply right?
       return {x:a.x*b.x, y:a.y*b.y}
     } else if (a.x != null) {
       return {x: a.x * b, y: a.y * b};
@@ -24,7 +25,6 @@ module.exports = {
   },
   'vec_sub': function(a, b) {
     if (a.x != null && b.x != null) {
-      console.log("Vector op -", a, b);
       return {x: a.x - b.x, y: a.y - b.y};
     } else {
       return a - b;
@@ -35,6 +35,18 @@ module.exports = {
       return {x: -a.x, y: -a.y};
     } else {
       return -a;
+    }
+  },
+  'vec_div': function(a, b) {
+    if (a.x != null && b.x != null) {
+      // TODO: is pairwise right?
+      return {x: a.x/b.x, y: a.y/b.y};
+    } else if (a.x != null) {
+      return {x: a.x/b, y:a.y/b};
+    } else if (b.y != null) {
+      return {x: b.x/a, y:b.y/a};
+    } else {
+      return a/b;
     }
   }
 }

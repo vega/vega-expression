@@ -389,6 +389,20 @@ function findTypes(ast) {
       }
     });
     break;
+  case "ConditionalExpression":
+    findTypes(ast.test);
+    findTypes(ast.consequent);
+    findTypes(ast.alternate);
+    if (implements(ast.consequent.typeOf, ast.alternate.typeOf)) {
+      ast.typeOf = ast.alternate.typeOf;
+    } else if (implements(ast.alternate.typeOf, ast.consequent.typeOf)) {
+      ast.typeOf = ast.consequent.typeOf;
+    } else {
+      console.warn("Warning: alternates of ternary conditional are not compatible");
+    }
+    break;
+  default:
+    console.log("Unknown AST type", ast);
   }
 }
 
