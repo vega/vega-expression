@@ -1,6 +1,5 @@
 var parser = require('./parser'),
     codegen = require('./codegen'),
-    findTypes = require('./find_types'),
     fns = require('./function_definitions');
 
 var expr = module.exports = {
@@ -16,10 +15,7 @@ var expr = module.exports = {
       var generator = codegen(opt),
           len = args.length,
           compile = function(str) {
-            var ast = expr.parse(str);
-            findTypes(ast);
-            console.log(ast);
-            var value = generator(ast);
+            var value = generator(expr.parse(str));
             args[len] = '"use strict"; return (' + value.code + ');';
             var generatedFn = Function.apply(null, args);
             console.log(generatedFn.toString());

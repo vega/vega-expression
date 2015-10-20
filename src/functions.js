@@ -105,11 +105,17 @@ module.exports = function(codegen) {
 
     // Vector operations
     'vec': 'fn.vec',
-    'vec_add': 'fn.vec_add',
-    'vec_sub': 'fn.vec_sub',
-    'vec_times': 'fn.vec_times',
-    'vec_len': 'fn.vec_len',
-    'vec_neg': 'fn.vec_neg',
-    'vec_div': 'fn.vec_div'
+    'vadd': 'fn.vec_add',
+    'vsub': 'fn.vec_sub',
+    'vtimes': 'fn.vec_times',
+    'vmag': 'fn.vec_mag',
+    'vmag2': 'fn.vec_mag2',
+    'vdist': 'fn.vec_dist',
+    'vdist2': 'fn.vec_dist2',
+    'vneg': 'fn.vec_neg',
+    'vdiv': 'fn.vec_div',
+    'vfliph': 'fn.vec_fliph',
+    'vflipv': 'fn.vec_flipv',
+    'vdot': 'fn.vec_dot'
   };
 };
