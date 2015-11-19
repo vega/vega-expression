@@ -26,5 +26,6 @@ var expr = module.exports = {
       return compile;
     },
   functions: require('./functions'),
+  functionDefinitions: require('./function_definitions'),
   constants: require('./constants')
 };

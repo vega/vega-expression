@@ -103,19 +103,7 @@ module.exports = function(codegen) {
         return a[0]+'?'+a[1]+':'+a[2];
       },
 
-    // Vector operations
-    'vec': 'fn.vec',
-    'vadd': 'fn.vec_add',
-    'vsub': 'fn.vec_sub',
-    'vtimes': 'fn.vec_times',
-    'vmag': 'fn.vec_mag',
-    'vmag2': 'fn.vec_mag2',
-    'vdist': 'fn.vec_dist',
-    'vdist2': 'fn.vec_dist2',
-    'vneg': 'fn.vec_neg',
-    'vdiv': 'fn.vec_div',
-    'vfliph': 'fn.vec_fliph',
-    'vflipv': 'fn.vec_flipv',
-    'vdot': 'fn.vec_dot'
+    // functions defined in function_definitions
+    'in_range': 'fn.in_range'
   };
 };
