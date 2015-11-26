@@ -18,8 +18,7 @@ var expr = module.exports = {
             var value = generator(expr.parse(str));
             args[len] = '"use strict"; return (' + value.code + ');';
             var generatedFn = Function.apply(null, args);
-            console.log(generatedFn.toString());
-            value.fn = generatedFn.bind(null, fns);
+            value.fn = generatedFn.bind(null, generator.functionDefinitions);
             return value;
           };
       compile.codegen = generator;

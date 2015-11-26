@@ -1,17 +1,19 @@
 
-module.exports = {
-  'in_range': function(val, a, b, exclusive) {
-    var min, max;
-    if (a < b) {
-      min = a;
-      max = b;
-    } else {
-      min = b;
-      max = a;
+module.exports = function (codegen) {
+  return {
+    'in_range': function(val, a, b, exclusive) {
+      var min, max;
+      if (a < b) {
+        min = a;
+        max = b;
+      } else {
+        min = b;
+        max = a;
+      }
+      if (exclusive)
+        return min < val && max > val;
+      else
+        return min <= val && max >= val;
     }
-    if (exclusive)
-      return min < val && max > val;
-    else
-      return min <= val && max >= val;
-  }
-};
+  };
+}
