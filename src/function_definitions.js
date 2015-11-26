@@ -1,7 +1,7 @@
 
 module.exports = function (codegen) {
   return {
-    'in_range': function(val, a, b, exclusive) {
+    'inRange': function(val, a, b, exclusive) {
       var min, max;
       if (a < b) {
         min = a;

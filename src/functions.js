@@ -104,6 +104,6 @@ module.exports = function(codegen) {
       },
 
     // functions defined in function_definitions
-    'in_range': 'fn.in_range'
+    'inRange': 'fn.in_range'
   };
 };
