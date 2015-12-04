@@ -1,6 +1,5 @@
 var parser = require('./parser'),
-    codegen = require('./codegen'),
-    fns = require('./function_definitions');
+    codegen = require('./codegen');
 
 var expr = module.exports = {
   parse: function(input, opt) {
@@ -11,27 +10,22 @@ var expr = module.exports = {
     },
   compiler: function(args, opt) {
       args = args.slice();
-      args.unshift('fn');
       var generator = codegen(opt),
           len = args.length,
           compile = function(str) {
             var value = generator(expr.parse(str));
             args[len] = '"use strict"; return (' + value.code + ');';
-            var generatedFn = Function.apply(null, args);
-            var fnDefs = generator.functionDefinitions;
-            if (len <= 8) {
-              value.fn = function(a, b, c, d, e, f, g) {
-                generatedFn(fnDefs, a, b, c, d, e, f, g);
-              }
-            } else {
-              value.fn = generatedFn.bind(null, fnDefs);
-            }
+            var fn = Function.apply(null, args);
+            value.fn = (args.length > 8) ?
+              function() { return fn.apply(value, arguments) } :
+              function(a, b, c, d, e, f, g) {
+                return fn.call(value, a, b, c, d, e, f, g);
+              }; // call often faster than apply, use if args low enough
             return value;
           };
       compile.codegen = generator;
       return compile;
     },
   functions: require('./functions'),
-  functionDefinitions: require('./function_definitions'),
   constants: require('./constants')
 };

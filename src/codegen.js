@@ -14,7 +14,7 @@ module.exports = function(opt) {
   opt = opt || {};
   var constants = opt.constants || require('./constants'),
       functions = (opt.functions || require('./functions'))(codegen),
-      functionDefinitions = (opt.functionDefinitions || require('./function_definitions'))(codegen),
+      functionDefs = opt.functionDefs ? opt.functionDefs(codegen) : {},
       idWhiteList = opt.idWhiteList ? toMap(opt.idWhiteList) : null,
       idBlackList = opt.idBlackList ? toMap(opt.idBlackList) : null,
       memberDepth = 0,
@@ -27,7 +27,8 @@ module.exports = function(opt) {
     var retval = {
       code: codegen(ast),
       globals: keys(globals),
-      fields: keys(fields)
+      fields: keys(fields),
+      defs: functionDefs
     };
     globals = {};
     fields = {};
@@ -129,7 +130,7 @@ module.exports = function(opt) {
   };
 
   codegen_wrap.functions = functions;
-  codegen_wrap.functionDefinitions = functionDefinitions;
+  codegen_wrap.functionDefs = functionDefs;
   codegen_wrap.constants = constants;
   return codegen_wrap;
 };
