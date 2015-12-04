@@ -17,7 +17,7 @@ var expr = module.exports = {
             args[len] = '"use strict"; return (' + value.code + ');';
             var fn = Function.apply(null, args);
             value.fn = (args.length > 8) ?
-              function() { return fn.apply(value, arguments) } :
+              function() { return fn.apply(value, arguments); } :
               function(a, b, c, d, e, f, g) {
                 return fn.call(value, a, b, c, d, e, f, g);
               }; // call often faster than apply, use if args low enough

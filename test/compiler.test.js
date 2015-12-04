@@ -27,7 +27,13 @@ describe('compiler', function() {
         (min < val && max > val) :
         (min <= val && max >= val);
     }
-    var compile = expr.compiler(['d'], {
+    function test(compile) {
+      expect(compile('inrange(2, 1, 3)').fn()).to.equal(true);
+      expect(compile('inrange(2, 3, 1)').fn()).to.equal(true);
+      expect(compile('inrange(2, 1, 2, true)').fn()).to.equal(false);
+      expect(compile('inrange(2, 1, 2, false)').fn()).to.equal(true);
+    }
+    var opt = {
       fieldVar: 'd',
       globalVar: 'global',
       functionDefs: function() {
@@ -38,10 +44,10 @@ describe('compiler', function() {
         f.inrange = 'this.defs.inrange';
         return f;
       }
-    });
-    expect(compile('inrange(2, 1, 3)').fn()).to.equal(true);
-    expect(compile('inrange(2, 3, 1)').fn()).to.equal(true);
-    expect(compile('inrange(2, 1, 2, true)').fn()).to.equal(false);
-    expect(compile('inrange(2, 1, 2, false)').fn()).to.equal(true);
+    };
+    // short-argument form
+    test(expr.compiler(['d'], opt));
+    // long-argument form
+    test(expr.compiler(['a','b','c','d','e','f','g','h'], opt));
   });
 });
