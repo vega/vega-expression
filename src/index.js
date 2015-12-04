@@ -19,7 +19,7 @@ var expr = module.exports = {
             args[len] = '"use strict"; return (' + value.code + ');';
             var generatedFn = Function.apply(null, args);
             var fnDefs = generator.functionDefinitions;
-            if (len < 8) {
+            if (len <= 8) {
               value.fn = function(a, b, c, d, e, f, g) {
                 generatedFn(fnDefs, a, b, c, d, e, f, g);
               }
