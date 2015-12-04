@@ -18,7 +18,14 @@ var expr = module.exports = {
             var value = generator(expr.parse(str));
             args[len] = '"use strict"; return (' + value.code + ');';
             var generatedFn = Function.apply(null, args);
-            value.fn = generatedFn.bind(null, generator.functionDefinitions);
+            var fnDefs = generator.functionDefinitions;
+            if (len < 8) {
+              value.fn = function(a, b, c, d, e, f, g) {
+                generatedFn(fnDefs, a, b, c, d, e, f, g);
+              }
+            } else {
+              value.fn = generatedFn.bind(null, fnDefs);
+            }
             return value;
           };
       compile.codegen = generator;
