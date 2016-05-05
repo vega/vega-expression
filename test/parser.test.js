@@ -1,7 +1,7 @@
 'use strict';
 
 var expect = require('chai').expect;
-var expr = require('../src/index');
+var expr = require('../build/expression');
 
 describe('parser', function() {
   function parse(str) { return function() { expr.parse(str); } }
@@ -242,7 +242,7 @@ describe('parser', function() {
 
   it('should not allow try/catch statements', function() {
     expect(parse('try { 3 } catch (err) { 4 }')).to.throw();
-    expect(parse('try { undefined() } catch (err) { 4 }')).to.throw();    
+    expect(parse('try { undefined() } catch (err) { 4 }')).to.throw();
   });
 
   it('should not allow if statements', function() {

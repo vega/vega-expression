@@ -1,6 +1,6 @@
 {
   "name": "vega-expression",
-  "version": "1.2.0",
+  "version": "2.0.0",
   "description": "Vega expression parser and code generator.",
   "repository": {
     "type": "git",
@@ -12,19 +12,19 @@
   },
   "license": "BSD-3-Clause",
   "devDependencies": {
-    "browserify": "^10.2.6",
+    "eslint": "^2.9.0",
+    "json2module": "0.0",
+    "rollup": "0.25",
+    "tape": "4",
     "chai": "^3.0.0",
     "istanbul": "latest",
-    "jshint": "^2.8.0",
     "mocha": "^2.2.5",
     "uglify-js": "^2.4.24"
   },
-  "main": "src/index.js",
+  "main": "build/expression.js",
+  "jsnext:main": "index.js",
   "scripts": {
-    "lint": "jshint src/",
-    "test": "mocha --recursive test/",
-    "cover": "istanbul cover _mocha -- --recursive test/",
-    "build": "browserify src/index.js -d -s vg.expression -o vega-expression.js",
-    "postbuild": "uglifyjs vega-expression.js -cm > vega-expression.min.js"
+    "pretest": "rm -rf build && mkdir build && json2module package.json > build/package.js && node_modules/.bin/rollup -f umd -n dataflow -o build/expression.js -- src/index.js",
+    "test": "mocha --recursive test/ && eslint index.js src"
   }
 }

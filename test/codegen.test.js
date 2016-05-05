@@ -1,7 +1,7 @@
 'use strict';
 
 var expect = require('chai').expect;
-var expr = require('../src/index');
+var expr = require('../build/expression');
 
 function regexEqual(x, y) {
   return (x instanceof RegExp) && (y instanceof RegExp) &&

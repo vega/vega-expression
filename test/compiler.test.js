@@ -1,8 +1,8 @@
 'use strict';
 
 var expect = require('chai').expect;
-var expr = require('../src/index');
-var functions = require('../src/functions');
+var expr = require('../build/expression');
+var functions = expr.functions;
 
 describe('compiler', function() {
 
