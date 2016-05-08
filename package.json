@@ -24,7 +24,11 @@
   "main": "build/expression.js",
   "jsnext:main": "index.js",
   "scripts": {
-    "pretest": "rm -rf build && mkdir build && json2module package.json > build/package.js && node_modules/.bin/rollup -f umd -n dataflow -o build/expression.js -- src/index.js",
-    "test": "mocha --recursive test/ && eslint index.js src"
+    "lint": "eslint index.js src",
+    "build": "rm -rf build && mkdir build && json2module package.json > build/package.js && node_modules/.bin/rollup -f umd -n vega_expression -o build/expression.js -- src/index.js",
+    "pretest": "npm run build",
+    "test": "mocha --recursive test/ && npm run lint",
+    "cover": "istanbul cover _mocha -- --recursive test/",
+    "postinstall": "npm run build"
   }
 }
