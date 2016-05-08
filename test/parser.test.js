@@ -4,7 +4,7 @@ var expect = require('chai').expect;
 var expr = require('../build/expression');
 
 describe('parser', function() {
-  function parse(str) { return function() { expr.parse(str); } }
+  function parse(str) { return function() { return expr.parse(str); } }
 
   it('should allow literal boolean expressions', function() {
     expect(parse('true')).to.not.throw();
@@ -15,28 +15,47 @@ describe('parser', function() {
     expect(parse('3')).to.not.throw();
     expect(parse('3.4')).to.not.throw();
     expect(parse('3e5')).to.not.throw();
+    expect(parse('3e+5')).to.not.throw();
+
+    expect(parse('0x')).to.throw();
+    expect(parse('0x0H')).to.throw();
+    expect(parse('3e+H')).to.throw();
   });
 
   it('should allow literal string expressions', function() {
     expect(parse("'a'")).to.not.throw();
     expect(parse('"b"')).to.not.throw();
+
+    expect(parse('"unterminated')).to.throw();
   });
 
   it('should allow literal regular expressions', function() {
     expect(parse('/a/')).to.not.throw();
     expect(parse('/[0-9]+/gi')).to.not.throw();
+    expect(parse('/a\\u{41}/u')).to.not.throw();
+    expect(parse('/a\\u{110000}/u')).to.throw();
+
+    expect(parse('/a/gimuy')).to.not.throw();
+    expect(parse('/a/a')).to.throw();
+    expect(parse('/a/\\u0067')).to.throw();
   });
 
   it('should allow literal array expressions', function() {
     expect(parse('[]')).to.not.throw();
     expect(parse('[0,1,2]')).to.not.throw();
     expect(parse('["a","b","c"]')).to.not.throw();
+    expect(parse('[0,,]')).to.not.throw();
   });
 
   it('should allow literal object expressions', function() {
     expect(parse('{}')).to.not.throw();
     expect(parse('{a:1, b:"c"}')).to.not.throw();
     expect(parse('{a:[0,1,2], b:[{a:1},{a:2}]}')).to.not.throw();
+    expect(parse('{1:1}')).to.not.throw();
+
+    // disallow duplicate keys
+    expect(parse('{a: 1, a: 2}')).to.throw();
+    expect(parse('{')).to.throw();
   });
 
   it('should allow unary expressions', function() {
@@ -60,6 +79,7 @@ describe('parser', function() {
     expect(parse('1>>>2')).to.not.throw();
     expect(parse('1^2')).to.not.throw();
     expect(parse('"a"+"b"')).to.not.throw();
+    expect(parse('1 in a')).to.not.throw();
   });
 
   it('should allow logical expressions', function() {
@@ -78,6 +98,10 @@ describe('parser', function() {
     expect(parse('1 !== 2')).to.not.throw();
   });
 
+  it('should allow complex expressions', function() {
+    expect(parse('1 + 2 - 3 / 4 * a.a + 4 & 3')).to.not.throw();
+  });
+
   it('should allow ternary conditional expressions', function() {
     expect(parse('a ? b : c')).to.not.throw();
     expect(parse('1 ? 2 : 3')).to.not.throw();
@@ -89,6 +113,8 @@ describe('parser', function() {
     expect(parse('µ')).to.not.throw();
     expect(parse('$f')).to.not.throw();
     expect(parse('_')).to.not.throw();
+    expect(parse('\\u0041')).to.not.throw();
+    expect(parse('A\\u0041')).to.not.throw();
   });
 
   it('should allow member expressions', function() {
@@ -96,6 +122,11 @@ describe('parser', function() {
     expect(parse('a.b')).to.not.throw();
     expect(parse('a["b"]')).to.not.throw();
     expect(parse('a["two words"]')).to.not.throw();
+    expect(parse('a.true')).to.not.throw();
+    expect(parse('a.function')).to.not.throw();
+    expect(parse('a.null')).to.not.throw();
+
+    expect(parse('a.+')).to.throw();
   });
 
   it('should allow call expressions', function() {
@@ -271,5 +302,38 @@ describe('parser', function() {
   it('should not allow do-while statements', function() {
     expect(parse('do { 3 } while (1 < 2)')).to.throw();
     expect(parse('do { 3 } while (1 > 2)')).to.throw();
+  });
+
+  it('should not allow octal literals or escape sequences', function() {
+    expect(parse('"\\01"')).to.throw();
+    expect(parse('012')).to.throw();
+  });
+
+  it('should not allow void expressions', function() {
+    expect(parse('void(0)')).to.throw();
+  });
+
+  it('should not allow delete expressions', function() {
+    expect(parse('delete a.x')).to.throw();
+  });
+
+  it('should not allow typeof expressions', function() {
+    expect(parse('typeof "hello"')).to.throw();
+  });
+
+  it('should parse escape sequences', function() {
+    expect(parse('"\\\n\\b\\f\\n\\r\\t\\v\\z\\u0023\\u{41}\\u{2F804}"')().value).to.equal('\b\f\n\r\t\vz\u0023\u0041\uD87E\uDC04');
+    expect(parse('"\\xhi"')).to.throw();
+    expect(parse('\\u{110000}')).to.throw();
+    expect(parse('\\u{}')).to.throw();
+  });
+
+  it('should ignore whitespace', function() {
+    expect(parse('5+ 5')).to.not.throw();
+    expect(parse('5+\n5')).to.not.throw();
+    expect(parse('5+\t5')).to.not.throw();
+    expect(parse('5+\v5')).to.not.throw();
+    expect(parse('5+\uFEFF5')).to.not.throw();
+    expect(parse('5+\r\n5')).to.not.throw();
   });
 });

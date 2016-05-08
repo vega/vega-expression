@@ -1,8 +1,8 @@
-import { parse as esprima } from './parser';
+import esprima from './parser';
 import codegen from './codegen';
 
-export function parse(input, opt) {
-  return esprima('('+input+')', opt);
+export function parse(input) {
+  return esprima(input);
 }
 
 export function compiler(args, opt) {

@@ -81,9 +81,6 @@ export default function(opt) {
         }
         return id;
       },
-    'Program': function(n) {
-        return n.body.map(codegen).join('\n');
-      },
     'MemberExpression': function(n) {
         var d = !n.computed;
         var o = codegen(n.object);
@@ -131,9 +128,6 @@ export default function(opt) {
         var k = codegen(n.key);
         memberDepth -= 1;
         return k + ':' + codegen(n.value);
-      },
-    'ExpressionStatement': function(n) {
-        return codegen(n.expression);
       }
   };
 
