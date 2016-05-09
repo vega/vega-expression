@@ -97,6 +97,7 @@ var RegexNonAsciiIdentifierStart = new RegExp('[\xAA\xB5\xBA\xC0-\xD6\xD8-\xF6\x
 // Do NOT use this to enforce a certain condition on any user input.
 
 function assert(condition, message) {
+  /* istanbul ignore next */
   if (!condition) {
     throw new Error('ASSERT: ' + message);
   }

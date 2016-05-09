@@ -217,9 +217,10 @@ describe('parser', function() {
     // but only \uXXXX escapes
     expect(parse('id\\n')).to.throw();
     expect(parse('\\n')).to.throw();
+    expect(parse('\\x4E')).to.throw();
     // And the unescaped character must be otherwise valid.
-    expect(parse('\\u0030')).to.throw(); // \u0030 = '0'
-    expect(parse('id\\u0020')).to.throw();
+    expect(parse('\\u0030')).to.throw(); // \u0030 = '0', not allowed at start of identifier
+    expect(parse('id\\u0020')).to.throw(); // \u0020 is a control character
   });
 
   it('should allow member expressions', function() {
@@ -438,6 +439,7 @@ describe('parser', function() {
   });
 
   it('should not allow octal literals or escape sequences', function() {
+    // octal literals are not allowed in strict mode.
     expect(parse('"\\01"')).to.throw();
     expect(parse('012')).to.throw();
   });
@@ -460,20 +462,31 @@ describe('parser', function() {
       value: '\b\f\n\r\t\vz\u0023\u0041\uD87E\uDC04',
       raw: '"\\\n\\b\\f\\n\\r\\t\\v\\z\\u0023\\u{41}\\u{2F804}"'
     });
+    // \0 is a special case, not an octal literal
     expect(parse('"\\0"')).to.not.throw();
+
     // octal literals are not allowed in strict mode
     expect(parse('"\\251"')).to.throw();
+    // malformed hex escape
     expect(parse('"\\xhi"')).to.throw();
+    // unicode codepoint is too large
     expect(parse('"\\u{110000}"')).to.throw();
+    // malformed unicode codepoint escape
     expect(parse('"\\u{}"')).to.throw();
   });
 
   it('should ignore whitespace', function() {
-    expect(parse('5+ 5')).to.not.throw();
-    expect(parse('5+\n5')).to.not.throw();
-    expect(parse('5+\t5')).to.not.throw();
-    expect(parse('5+\v5')).to.not.throw();
-    expect(parse('5+\uFEFF5')).to.not.throw();
-    expect(parse('5+\r\n5')).to.not.throw();
+    var tree = {
+      type: "BinaryExpression",
+      operator: "+",
+      left: {type: "Literal", value: 1, raw: "1"},
+      right: {type: "Literal", value: 2, raw: "2"},
+    };
+    expect(parse('1+ 2')()).to.eql(tree);
+    expect(parse('1+\n2')()).to.eql(tree);
+    expect(parse('1+\t2')()).to.eql(tree);
+    expect(parse('1+\v2')()).to.eql(tree);
+    expect(parse('1+\uFEFF2')()).to.eql(tree);
+    expect(parse('1+\r\n2')()).to.eql(tree);
   });
 });
