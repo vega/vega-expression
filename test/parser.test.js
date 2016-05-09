@@ -161,7 +161,7 @@ describe('parser', function() {
       operator: '&&',
       left: {type: 'Literal', value: 1, raw: '1'},
       right: {type: 'Literal', value: 2, raw: '2'}
-    })
+    });
     expect(parse('1 || 2')).to.not.throw();
   });
 
