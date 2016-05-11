@@ -1489,12 +1489,17 @@ function parseExpression() {
 }
 
 export default function parse(code) {
-  source = '(' + code + ')';
+  source = code;
   index = 0;
   length = source.length;
   lookahead = null;
 
   peek();
 
-  return parseExpression();
+  var expr = parseExpression();
+
+  if (lookahead.type !== TokenEOF) {
+    throw new Error("Unexpect token after expression.");
+  }
+  return expr;
 }
