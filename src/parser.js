@@ -39,6 +39,8 @@ var TokenName,
   length,
   lookahead;
 
+import ASTNode from './ASTNode';
+
 var TokenBooleanLiteral = 1,
   TokenEOF = 2,
   TokenIdentifier = 3,
@@ -889,10 +891,6 @@ function peek() {
   index = pos;
 }
 
-function ASTNode(type) {
-  this.type = type;
-}
-
 function finishArrayExpression(elements) {
   var node = new ASTNode(SyntaxArrayExpression);
   node.elements = elements;
@@ -970,9 +968,6 @@ function finishUnaryExpression(operator, argument) {
   node.prefix = true;
   return node;
 }
-
-ASTNode.prototype = {
-};
 
 // Throw an exception
 
