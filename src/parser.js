@@ -889,93 +889,89 @@ function peek() {
   index = pos;
 }
 
-function Node() {
-  // Skip comment.
-  index = lookahead.start;
+function ASTNode(type) {
+  this.type = type;
 }
 
-function WrappingNode(/*startToken*/) {
+function finishArrayExpression(elements) {
+  var node = new ASTNode(SyntaxArrayExpression);
+  node.elements = elements;
+  return node;
 }
 
-WrappingNode.prototype = Node.prototype = {
+function finishBinaryExpression(operator, left, right) {
+  var node = new ASTNode((operator === '||' || operator === '&&') ? SyntaxLogicalExpression : SyntaxBinaryExpression);
+  node.operator = operator;
+  node.left = left;
+  node.right = right;
+  return node;
+}
 
-  finishArrayExpression: function(elements) {
-    this.type = SyntaxArrayExpression;
-    this.elements = elements;
-    return this;
-  },
+function finishCallExpression(callee, args) {
+  var node = new ASTNode(SyntaxCallExpression);
+  node.callee = callee;
+  node.arguments = args;
+  return node;
+}
 
-  finishBinaryExpression: function(operator, left, right) {
-    this.type = (operator === '||' || operator === '&&') ? SyntaxLogicalExpression : SyntaxBinaryExpression;
-    this.operator = operator;
-    this.left = left;
-    this.right = right;
-    return this;
-  },
+function finishConditionalExpression(test, consequent, alternate) {
+  var node = new ASTNode(SyntaxConditionalExpression);
+  node.test = test;
+  node.consequent = consequent;
+  node.alternate = alternate;
+  return node;
+}
 
-  finishCallExpression: function(callee, args) {
-    this.type = SyntaxCallExpression;
-    this.callee = callee;
-    this.arguments = args;
-    return this;
-  },
+function finishIdentifier(name) {
+  var node = new ASTNode(SyntaxIdentifier);
+  node.name = name;
+  return node;
+}
 
-  finishConditionalExpression: function(test, consequent, alternate) {
-    this.type = SyntaxConditionalExpression;
-    this.test = test;
-    this.consequent = consequent;
-    this.alternate = alternate;
-    return this;
-  },
-
-  finishIdentifier: function(name) {
-    this.type = SyntaxIdentifier;
-    this.name = name;
-    return this;
-  },
-
-  finishLiteral: function(token) {
-    this.type = SyntaxLiteral;
-    this.value = token.value;
-    this.raw = source.slice(token.start, token.end);
-    if (token.regex) {
-      if (this.raw == '//') {
-        this.raw = '/(?:)/';
-      }
-      this.regex = token.regex;
+function finishLiteral(token) {
+  var node = new ASTNode(SyntaxLiteral);
+  node.value = token.value;
+  node.raw = source.slice(token.start, token.end);
+  if (token.regex) {
+    if (node.raw === '//') {
+      node.raw = '/(?:)/';
     }
-    return this;
-  },
-
-  finishMemberExpression: function(accessor, object, property) {
-    this.type = SyntaxMemberExpression;
-    this.computed = accessor === '[';
-    this.object = object;
-    this.property = property;
-    return this;
-  },
-
-  finishObjectExpression: function(properties) {
-    this.type = SyntaxObjectExpression;
-    this.properties = properties;
-    return this;
-  },
-
-  finishProperty: function(kind, key, value) {
-    this.type = SyntaxProperty;
-    this.key = key;
-    this.value = value;
-    this.kind = kind;
-    return this;
-  },
-
-  finishUnaryExpression: function(operator, argument) {
-    this.type = SyntaxUnaryExpression;
-    this.operator = operator;
-    this.argument = argument;
-    this.prefix = true;
-    return this;
+    node.regex = token.regex;
   }
+  return node;
+}
+
+function finishMemberExpression(accessor, object, property) {
+  var node = new ASTNode(SyntaxMemberExpression);
+  node.computed = accessor === '[';
+  node.object = object;
+  node.property = property;
+  return node;
+}
+
+function finishObjectExpression(properties) {
+  var node = new ASTNode(SyntaxObjectExpression);
+  node.properties = properties;
+  return node;
+}
+
+function finishProperty(kind, key, value) {
+  var node = new ASTNode(SyntaxProperty);
+  node.key = key;
+  node.value = value;
+  node.kind = kind;
+  return node;
+}
+
+function finishUnaryExpression(operator, argument) {
+  var node = new ASTNode(SyntaxUnaryExpression);
+  node.operator = operator;
+  node.argument = argument;
+  node.prefix = true;
+  return node;
+}
+
+ASTNode.prototype = {
 };
 
 // Throw an exception
@@ -1050,9 +1046,9 @@ function matchKeyword(keyword) {
 // 11.1.4 Array Initialiser
 
 function parseArrayInitialiser() {
-  var elements = [],
-    node = new Node();
+  var elements = [];
 
+  index = lookahead.start;
   expect('[');
 
   while (!match(']')) {
@@ -1070,14 +1066,15 @@ function parseArrayInitialiser() {
 
   lex();
 
-  return node.finishArrayExpression(elements);
+  return finishArrayExpression(elements);
 }
 
 // 11.1.5 Object Initialiser
 
 function parseObjectPropertyKey() {
-  var token, node = new Node();
+  var token;
 
+  index = lookahead.start;
   token = lex();
 
   // Note: This function is called only from parseObjectProperty(), where
@@ -1087,22 +1084,23 @@ function parseObjectPropertyKey() {
     if (token.octal) {
       throwError(token, MessageStrictOctalLiteral);
     }
-    return node.finishLiteral(token);
+    return finishLiteral(token);
   }
 
-  return node.finishIdentifier(token.value);
+  return finishIdentifier(token.value);
 }
 
 function parseObjectProperty() {
-  var token, key, id, value, node = new Node();
+  var token, key, id, value;
 
+  index = lookahead.start;
   token = lookahead;
 
   if (token.type === TokenIdentifier) {
     id = parseObjectPropertyKey();
     expect(':');
     value = parseConditionalExpression();
-    return node.finishProperty('init', id, value);
+    return finishProperty('init', id, value);
   }
   if (token.type === TokenEOF || token.type === TokenPunctuator) {
     throwUnexpected(token);
@@ -1110,16 +1108,16 @@ function parseObjectProperty() {
     key = parseObjectPropertyKey();
     expect(':');
     value = parseConditionalExpression();
-    return node.finishProperty('init', key, value);
+    return finishProperty('init', key, value);
   }
 }
 
 function parseObjectInitialiser() {
   var properties = [],
     property, name, key, map = {},
-    toString = String,
-    node = new Node();
+    toString = String;
 
+  index = lookahead.start;
   expect('{');
 
   while (!match('}')) {
@@ -1147,7 +1145,7 @@ function parseObjectInitialiser() {
 
   expect('}');
 
-  return node.finishObjectExpression(properties);
+  return finishObjectExpression(properties);
 }
 
 // 11.1.6 The Grouping Operator
@@ -1173,7 +1171,7 @@ var legalKeywords = {
 };
 
 function parsePrimaryExpression() {
-  var type, token, expr, node;
+  var type, token, expr;
 
   if (match('(')) {
     return parseGroupExpression();
@@ -1188,27 +1186,28 @@ function parsePrimaryExpression() {
   }
 
   type = lookahead.type;
-  node = new Node();
+  index = lookahead.start;
+
 
   if (type === TokenIdentifier || legalKeywords[lookahead.value]) {
-    expr = node.finishIdentifier(lex().value);
+    expr = finishIdentifier(lex().value);
   } else if (type === TokenStringLiteral || type === TokenNumericLiteral) {
     if (lookahead.octal) {
       throwError(lookahead, MessageStrictOctalLiteral);
     }
-    expr = node.finishLiteral(lex());
+    expr = finishLiteral(lex());
   } else if (type === TokenKeyword) {
     throw new Error(DISABLED);
   } else if (type === TokenBooleanLiteral) {
     token = lex();
     token.value = (token.value === 'true');
-    expr = node.finishLiteral(token);
+    expr = finishLiteral(token);
   } else if (type === TokenNullLiteral) {
     token = lex();
     token.value = null;
-    expr = node.finishLiteral(token);
+    expr = finishLiteral(token);
   } else if (match('/') || match('/=')) {
-    expr = node.finishLiteral(scanRegExp());
+    expr = finishLiteral(scanRegExp());
     peek();
   } else {
     throwUnexpected(lex());
@@ -1240,15 +1239,15 @@ function parseArguments() {
 }
 
 function parseNonComputedProperty() {
-  var token, node = new Node();
-
+  var token;
+  index = lookahead.start;
   token = lex();
 
   if (!isIdentifierName(token)) {
     throwUnexpected(token);
   }
 
-  return node.finishIdentifier(token.value);
+  return finishIdentifier(token.value);
 }
 
 function parseNonComputedMember() {
@@ -1277,13 +1276,13 @@ function parseLeftHandSideExpressionAllowCall() {
   for (;;) {
     if (match('.')) {
       property = parseNonComputedMember();
-      expr = new WrappingNode().finishMemberExpression('.', expr, property);
+      expr = finishMemberExpression('.', expr, property);
     } else if (match('(')) {
       args = parseArguments();
-      expr = new WrappingNode().finishCallExpression(expr, args);
+      expr = finishCallExpression(expr, args);
     } else if (match('[')) {
       property = parseComputedMember();
-      expr = new WrappingNode().finishMemberExpression('[', expr, property);
+      expr = finishMemberExpression('[', expr, property);
     } else {
       break;
     }
@@ -1318,7 +1317,7 @@ function parseUnaryExpression() {
   } else if (match('+') || match('-') || match('~') || match('!')) {
     token = lex();
     expr = parseUnaryExpression();
-    expr = new WrappingNode().finishUnaryExpression(token.value, expr);
+    expr = finishUnaryExpression(token.value, expr);
   } else if (matchKeyword('delete') || matchKeyword('void') || matchKeyword('typeof')) {
     throw new Error(DISABLED);
   } else {
@@ -1431,7 +1430,7 @@ function parseBinaryExpression() {
       operator = stack.pop().value;
       left = stack.pop();
       markers.pop();
-      expr = new WrappingNode().finishBinaryExpression(operator, left, right);
+      expr = finishBinaryExpression(operator, left, right);
       stack.push(expr);
     }
 
@@ -1450,7 +1449,7 @@ function parseBinaryExpression() {
   markers.pop();
   while (i > 1) {
     markers.pop()
-    expr = new WrappingNode().finishBinaryExpression(stack[i - 1].value, stack[i - 2], expr);
+    expr = finishBinaryExpression(stack[i - 1].value, stack[i - 2], expr);
     i -= 2;
   }
 
@@ -1470,7 +1469,7 @@ function parseConditionalExpression() {
     expect(':');
     alternate = parseConditionalExpression();
 
-    expr = new WrappingNode().finishConditionalExpression(expr, consequent, alternate);
+    expr = finishConditionalExpression(expr, consequent, alternate);
   }
 
   return expr;
