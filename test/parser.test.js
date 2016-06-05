@@ -57,6 +57,13 @@ describe('parser', function() {
       raw: '/a/',
       regex: { pattern: 'a', flags: ''}
     });
+    // Empty regex
+    expect(parse('//')()).to.eql({
+      type: 'Literal',
+      value: {},
+      raw: '/(?:)/',
+      regex: { pattern: '', flags: ''}
+    });
     expect(parse('/[0-9]+/gi')).to.not.throw();
     expect(parse('/a\\u{41}/u')).to.not.throw();
     expect(parse('/a\\u{110000}/u')).to.throw();
@@ -234,7 +241,7 @@ describe('parser', function() {
       type: 'MemberExpression',
       computed: false,
       object: {type: 'Identifier', name: 'a'},
-      property: {type: 'Identifier', name: 'b'}
+      property: {type: 'Identifier', name: 'b', member: true}
     })
     expect(parse('a["b"]')).to.not.throw();
     expect(parse('a["two words"]')).to.not.throw();
@@ -242,7 +249,7 @@ describe('parser', function() {
       type: 'MemberExpression',
       computed: false,
       object: {type: 'Identifier', name: 'a'},
-      property: {type: 'Identifier', name: 'true'}
+      property: {type: 'Identifier', name: 'true', member: true}
     })
     expect(parse('a.function')).to.not.throw();
     expect(parse('a.null')).to.not.throw();

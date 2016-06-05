@@ -1,6 +1,24 @@
 import esprima from './parser';
 import codegen from './codegen';
 
+import Compiler from './Compiler';
+import { idWhiteListVisitor, codegenVisitor, functionRewriteVisitor } from './visitors';
+import { GLOBAL } from './tags';
+
+var c = new Compiler([
+  functionRewriteVisitor({
+    clamp: 'this.injected.clamp'
+  }),
+  idWhiteListVisitor(['datum', 'event']),
+  codegenVisitor({
+    Identifier: [
+      { tag: GLOBAL, fn: function(n) { return 'this.injected.signals["' + n.name + '"]._value'; }}
+    ]
+  })
+]);
+
+console.log(c.process('Hello + clamp()'));
+
 export function parse(input) {
   return esprima(input);
 }
@@ -24,7 +42,7 @@ export function compiler(args, opt) {
   return compile;
 }
 
-
 export { default as code } from './codegen';
 export { default as functions } from './functions';
-export { default as constants } from './constants'
+export { default as constants } from './constants';
+export { default as Visitor } from './Visitor'

@@ -944,6 +944,7 @@ function finishMemberExpression(accessor, object, property) {
   node.computed = accessor === '[';
   node.object = object;
   node.property = property;
+  if (!node.computed) property.member = true;
   return node;
 }
 
