@@ -7,3 +7,5 @@ temp
 vega-expression.js
 vega-expression.js.map
 vega-expression.min.js
+build/
+npm-debug.log

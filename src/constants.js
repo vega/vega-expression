@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   'NaN':     'NaN',
   'E':       'Math.E',
   'LN2':     'Math.LN2',

@@ -1,4 +1,4 @@
-module.exports = function(codegen) {
+export default function(codegen) {
 
   function fncall(name, args, cast, type) {
     var obj = codegen(args[0]);
@@ -104,4 +104,4 @@ module.exports = function(codegen) {
         return a[0]+'?'+a[1]+':'+a[2];
       }
   };
-};
+}

@@ -10,10 +10,13 @@ function keys(object) {
   return list;
 }
 
-module.exports = function(opt) {
+import Constants from './constants'
+import Functions from './functions'
+
+export default function(opt) {
   opt = opt || {};
-  var constants = opt.constants || require('./constants'),
-      functions = (opt.functions || require('./functions'))(codegen),
+  var constants = opt.constants || Constants,
+      functions = (opt.functions || Functions)(codegen),
       functionDefs = opt.functionDefs ? opt.functionDefs(codegen) : {},
       idWhiteList = opt.idWhiteList ? toMap(opt.idWhiteList) : null,
       idBlackList = opt.idBlackList ? toMap(opt.idBlackList) : null,
@@ -78,9 +81,6 @@ module.exports = function(opt) {
         }
         return id;
       },
-    'Program': function(n) {
-        return n.body.map(codegen).join('\n');
-      },
     'MemberExpression': function(n) {
         var d = !n.computed;
         var o = codegen(n.object);
@@ -128,9 +128,6 @@ module.exports = function(opt) {
         var k = codegen(n.key);
         memberDepth -= 1;
         return k + ':' + codegen(n.value);
-      },
-    'ExpressionStatement': function(n) {
-        return codegen(n.expression);
       }
   };
 
@@ -138,4 +135,4 @@ module.exports = function(opt) {
   codegen_wrap.functionDefs = functionDefs;
   codegen_wrap.constants = constants;
   return codegen_wrap;
-};
+}

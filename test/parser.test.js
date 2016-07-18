@@ -1,12 +1,12 @@
 'use strict';
 
 var expect = require('chai').expect;
-var expr = require('../src/index');
+var expr = require('../build/expression');
 
 require('chai').config.truncateThreshold = 0; // disable truncating
 
 describe('parser', function() {
-  function parse(str) { return function() { return JSON.parse(JSON.stringify(expr.parse(str).body[0].expression)); } }
+  function parse(str) { return function() { return JSON.parse(JSON.stringify(expr.parse(str))); } }
 
   it('should allow literal boolean expressions', function() {
     expect(parse('true')()).to.eql({
@@ -56,6 +56,13 @@ describe('parser', function() {
       value: {},
       raw: '/a/',
       regex: { pattern: 'a', flags: ''}
+    });
+    // Empty regex
+    expect(parse('//')()).to.eql({
+      type: 'Literal',
+      value: {},
+      raw: '/(?:)/',
+      regex: { pattern: '', flags: ''}
     });
     expect(parse('/[0-9]+/gi')).to.not.throw();
     expect(parse('/a\\u{41}/u')).to.not.throw();
@@ -161,7 +168,7 @@ describe('parser', function() {
       operator: '&&',
       left: {type: 'Literal', value: 1, raw: '1'},
       right: {type: 'Literal', value: 2, raw: '2'}
-    })
+    });
     expect(parse('1 || 2')).to.not.throw();
   });
 
@@ -217,9 +224,10 @@ describe('parser', function() {
     // but only \uXXXX escapes
     expect(parse('id\\n')).to.throw();
     expect(parse('\\n')).to.throw();
+    expect(parse('\\x4E')).to.throw();
     // And the unescaped character must be otherwise valid.
-    expect(parse('\\u0030')).to.throw(); // \u0030 = '0'
-    expect(parse('id\\u0020')).to.throw();
+    expect(parse('\\u0030')).to.throw(); // \u0030 = '0', not allowed at start of identifier
+    expect(parse('id\\u0020')).to.throw(); // \u0020 is a control character
   });
 
   it('should allow member expressions', function() {
@@ -233,7 +241,7 @@ describe('parser', function() {
       type: 'MemberExpression',
       computed: false,
       object: {type: 'Identifier', name: 'a'},
-      property: {type: 'Identifier', name: 'b'}
+      property: {type: 'Identifier', name: 'b', member: true}
     })
     expect(parse('a["b"]')).to.not.throw();
     expect(parse('a["two words"]')).to.not.throw();
@@ -241,7 +249,7 @@ describe('parser', function() {
       type: 'MemberExpression',
       computed: false,
       object: {type: 'Identifier', name: 'a'},
-      property: {type: 'Identifier', name: 'true'}
+      property: {type: 'Identifier', name: 'true', member: true}
     })
     expect(parse('a.function')).to.not.throw();
     expect(parse('a.null')).to.not.throw();
@@ -463,6 +471,7 @@ describe('parser', function() {
     });
     // \0 is a special case, not an octal literal
     expect(parse('"\\0"')).to.not.throw();
+
     // octal literals are not allowed in strict mode
     expect(parse('"\\251"')).to.throw();
     // malformed hex escape
