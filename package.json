@@ -2,33 +2,36 @@
   "name": "vega-expression",
   "version": "2.0.0",
   "description": "Vega expression parser and code generator.",
-  "repository": {
-    "type": "git",
-    "url": "http://github.com/vega/vega-expression.git"
-  },
   "author": {
     "name": "Jeffrey Heer",
     "url": "http://idl.cs.washington.edu"
   },
+  "contributors": [
+    {
+      "name": "Ryan Russell",
+      "url": "https://github.com/RussellSprouts"
+    }
+  ],
   "license": "BSD-3-Clause",
-  "devDependencies": {
-    "eslint": "^2.9.0",
-    "json2module": "0.0",
-    "rollup": "0.25",
-    "tape": "4",
-    "chai": "^3.0.0",
-    "istanbul": "latest",
-    "mocha": "^2.2.5",
-    "uglify-js": "^2.4.24"
-  },
-  "main": "build/expression.js",
+  "main": "build/vega-expression.js",
   "jsnext:main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/vega/vega-expression.git"
+  },
   "scripts": {
-    "lint": "eslint index.js src",
-    "build": "rm -rf build && mkdir build && json2module package.json > build/package.js && node_modules/.bin/rollup -f umd -n vg.expression -o build/expression.js -- src/index.js && uglify -s build/expression.js -o build/expression.min.js",
-    "pretest": "npm run build",
-    "test": "mocha --recursive test/ && npm run lint",
-    "cover": "istanbul cover _mocha -- --recursive test/",
-    "postinstall": "npm run build"
+    "build": "npm run test && uglifyjs build/vega-expression.js -c -m -o build/vega-expression.min.js",
+    "pretest": "rm -rf build && mkdir build && json2module package.json > build/package.js && rollup -f umd -g vega-util:vega -n vega -o build/vega-expression.js -- index.js",
+    "test": "tape 'test/**/*-test.js' && eslint index.js src test"
+  },
+  "dependencies": {
+    "vega-util": "1"
+  },
+  "devDependencies": {
+    "eslint": "2",
+    "json2module": "0.0",
+    "rollup": "0.34",
+    "tape": "4",
+    "uglify-js": "2"
   }
 }

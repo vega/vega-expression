@@ -39,7 +39,9 @@ var TokenName,
   length,
   lookahead;
 
-import ASTNode from './ASTNode';
+function ASTNode(type) {
+  this.type = type;
+}
 
 var TokenBooleanLiteral = 1,
   TokenEOF = 2,
@@ -1483,7 +1485,7 @@ function parseExpression() {
   return expr;
 }
 
-export default function parse(code) {
+export default function(code) {
   source = code;
   index = 0;
   length = source.length;
