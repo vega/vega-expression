@@ -285,6 +285,7 @@ describe('evaluate', function() {
       expect(evaluate('if(datum.a > 1, if(event.type === "mousedown", 3, 4), 2)')).to.equal(4);
       expect(evaluate.fn('if(datum.a > 1, 1)')).to.throw();
       expect(evaluate.fn('if(datum.a > 1, 1, 2, 3)')).to.throw();
+      expect(evaluate('0 * if(datum.a > 1, 1, 2)')).to.equal(0);
     });
 
     it('should not eval undefined functions', function() {

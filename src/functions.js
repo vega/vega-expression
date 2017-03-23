@@ -101,7 +101,7 @@ module.exports = function(codegen) {
         if (args.length > 3)
           throw new Error('Too many arguments to if function.');
         var a = args.map(codegen);
-        return a[0]+'?'+a[1]+':'+a[2];
+        return '('+a[0]+'?'+a[1]+':'+a[2]+')';
       }
   };
 };
