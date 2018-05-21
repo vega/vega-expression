@@ -250,6 +250,8 @@ tape('Evaluate expressions with white list', function(test) {
   test.equal(evaluate('utc(2009,9,1,10)'), u);
   test.equal(evaluate('utchours(utc(2009,9,1,10))'), new Date(u).getUTCHours());
 
+  test.deepEqual(evaluate('merge({a: 1, b: 2}, {b: 3, c: 4})'), {a: 1, b: 3, c: 4});
+
   // should evaluate if statements
   test.equal(evaluate('if(datum.a > 1, 1, 2)'), 1);
   test.equal(evaluate('if(event.type === "mousedown", 1, 2)'), 2);
